@@ -1,0 +1,25 @@
+{
+  "name": "candle.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/warycat/candle.js",
+  "authors": [
+    "Larry Fantasy <larry.fantasy@gmail.com>"
+  ],
+  "description": "A JavaScript 2.5D Rendering Engine",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "keywords": [
+    "3D",
+    "2D",
+    "2.5D",
+    "3d",
+    "2d",
+    "2.5d"
+  ]
+}
