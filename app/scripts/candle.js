@@ -48,6 +48,7 @@ var CANDLE = (function(){
     for(var i=0;i<110;i++){
       urls.push('images/tiles/tile_'+i+'.png');
     }
+    urls.push('images/walls.png');
     return urls;
   }
 

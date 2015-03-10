@@ -8,28 +8,31 @@ var Camera = (function(){
   var planeY = 0.66;
   var time = 0;
   var oldTime = 0;
-  var _moveSpeed = 5;
+  var _moveSpeed = 4;
   var _rotSpeed = 2;
   var off = true;
   var c = Screen.renderer.view;
   var ctx = c.getContext('2d');
   var tiles = [];
+  var walls;
   var texWidth = 64;
   var texHeight = 64;
   var pixel = 2;
 
   function init(){
     off = false;
+
     for(var i=0;i<110;i++){
       tiles[i]=PIXI.BaseTextureCache['images/tiles/tile_'+i+'.png'].source;
     }
+    walls = PIXI.BaseTextureCache['images/walls.png'].source;
   }
 
   function castRays(){
     w = Screen.width();
     h = Screen.height();
     for(var x = 0;x<w;x+=pixel){
-      var cameraX = 2 * x / w - 1;
+      var cameraX = 2 * x / w - 1.0;
       var rayPosX = posX;
       var rayPosY = posY;
       var rayDirX = dirX + planeX * cameraX;
@@ -92,7 +95,7 @@ var Camera = (function(){
       }
       var drawEnd = lineHeight / 2 + h / 2;
       if(drawEnd >= h) {
-        drawEnd = h - 1;
+        drawEnd = h;
       }
 
       var texNum = MAP.M[mapX][mapY] - 1;
@@ -111,7 +114,7 @@ var Camera = (function(){
       if(side === 1 && rayDirY < 0) {
         texX = 64 - texX - 1;
       }
-      ctx.drawImage(tiles[texNum], texX,0,pixel,64, x,drawStart,pixel,drawEnd - drawStart + 1);
+      ctx.drawImage(walls, texX,64*texNum,pixel,64, x,drawStart,pixel,drawEnd - drawStart + 1);
 
       var floorXWall, floorYWall;
       if(side === 0 && rayDirX > 0){
@@ -149,93 +152,10 @@ var Camera = (function(){
         
         var floorTexture = 82;
         
-        ctx.drawImage(tiles[floorTexture], floorTexX, floorTexY, pixel, pixel,x,y,pixel,pixel);
-        ctx.drawImage(tiles[floorTexture], floorTexX, floorTexY, pixel, pixel,x,h-y,pixel,pixel);
+        ctx.drawImage(walls, floorTexX, floorTexY + floorTexture * 64, pixel, pixel,x,y,pixel,pixel);
+        // ctx.drawImage(walls, floorTexX, floorTexY + 100 * 64, pixel, pixel,x,h-y,pixel,pixel);
       }
     }
-
-  //   var w = strips.children.length;
-  //   var h = Screen.height();
-  //   _.each(strips.children, function(strip, x){
-  //     var cameraX = 2 * x / w - 1;
-  //     var rayPosX = posX;
-  //     var rayPosY = posY;
-  //     var rayDirX = dirX + planeX * cameraX;
-  //     var rayDirY = dirY + planeY * cameraX;
-  //     var mapX = Math.floor(rayPosX);
-  //     var mapY = Math.floor(rayPosY);
-
-  //     var sideDistX;
-  //     var sideDistY;
-
-  //     var deltaDistX = Math.sqrt(1 + (rayDirY * rayDirY)/(rayDirX * rayDirX));
-  //     var deltaDistY = Math.sqrt(1 + (rayDirX * rayDirX)/(rayDirY * rayDirY));
-  //     var perpWallDist;
-
-  //     var stepX;
-  //     var stepY;
-
-  //     var hit = 0;
-  //     var side;
-
-  //     if(rayDirX < 0){
-  //       stepX = -1;
-  //       sideDistX = (rayPosX - mapX) * deltaDistX;
-  //     }else{
-  //       stepX = 1;
-  //       sideDistX = (mapX + 1 - rayPosX) * deltaDistX;
-  //     }
-  //     if(rayDirY < 0){
-  //       stepY = -1;
-  //       sideDistY = (rayPosY - mapY) * deltaDistY;
-  //     }else{
-  //       stepY = 1;
-  //       sideDistY = (mapY + 1 - rayPosY) * deltaDistY;
-  //     }
-
-  //     while(hit === 0){
-  //       if(sideDistX < sideDistY){
-  //         sideDistX += deltaDistX;
-  //         mapX += stepX;
-  //         side = 0;
-  //       }else{
-  //         sideDistY += deltaDistY;
-  //         mapY += stepY;
-  //         side = 1;
-  //       }
-  //       if(MAP.M[mapX][mapY] > 0){
-  //         hit = 1;
-  //       }
-  //     }
-  //     if(side===0){
-  //       perpWallDist = Math.abs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX);
-  //     }else{
-  //       perpWallDist = Math.abs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY);
-  //     }
-  //     var lineHeight = Math.abs( Math.floor(h / perpWallDist ));
-  //     strip.position.y = (h - lineHeight)/2;
-  //     strip.height = lineHeight;
-  //     var texNum = MAP.M[mapX][mapY] - 1;
-  //     var wallX;
-  //     if(side === 1){
-  //       wallX = rayPosX + ((mapY - rayPosY + (1 - stepY) / 2) / rayDirY) * rayDirX;
-  //     }else{
-  //       wallX = rayPosY + ((mapX - rayPosX + (1 - stepY) / 2) / rayDirX) * rayDirY;
-  //     }
-  //     wallX -= Math.floor(wallX);
-  //     var texX = Math.floor(wallX * 64);
-  //     if(side === 0 && rayDirX > 0) {
-  //       texX = 64 - texX - 1;
-  //     }
-  //     if(side === 1 && rayDirY < 0) {
-  //       texX = 64 - texX - 1;
-  //     }
-  //     var stripFrameRect = new PIXI.Rectangle(texNum * 64 + texX, 0, 1, 64);
-  //     var stripTexture = new PIXI.Texture(MAP.T,stripFrameRect);
-  //     strip.width = 1;
-  //     strip.texture = stripTexture;
-  //   });
-
   }
 
   function move(){
@@ -253,6 +173,20 @@ var Camera = (function(){
       if(!MAP.M[Math.floor(posX)][Math.floor(posY + moveDirY * frameTime * _moveSpeed)]){
         posY = posY + moveDirY * frameTime * _moveSpeed;
       }
+
+      // if(MAP.M[Math.floor(posX+10)][Math.floor(posY)]){
+      //   posX -= 10;
+      // }
+      // if(MAP.M[Math.floor(posX-10)][Math.floor(posY)]){
+      //   posX += 10;
+      // }
+      // if(MAP.M[Math.floor(posX)][Math.floor(posY+10)]){
+      //   posY -= 10;
+      // }
+      // if(MAP.M[Math.floor(posX)][Math.floor(posY-10)]){
+      //   posY += 10;
+      // }
+
     }
 
     var rotSpeed = (DS4.k('L1') - DS4.k('R1')) * _rotSpeed * frameTime;
